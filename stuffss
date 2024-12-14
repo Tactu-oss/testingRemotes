@@ -106,11 +106,11 @@ local Toggle = Tab:CreateToggle({
 	Callback = function(Value)
 		if getgenv().PlayerTV ~= nil and game.Players:FindFirstChild(tostring(getgenv().PlayerTV)) then
 			if Value == true then
-				Cam.CameraType = Enum.CameraType.Scriptable
+				cam.CameraType = Enum.CameraType.Scriptable
 				getgenv().VState1 = true
 			else
 				getgenv().VState1 = false
-				Cam.CameraType = Enum.CameraType.Custom
+				cam.CameraType = Enum.CameraType.Custom
 			end
 		else
 			if Value == false then
