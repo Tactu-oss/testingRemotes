@@ -1,0 +1,392 @@
+local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/Tactu-oss/Trials/refs/heads/main/MainRayField'))()
+
+local Window = Rayfield:CreateWindow({
+    Name = "Legacy Hub",
+    Icon = 0, -- Icon in Topbar. Can use Lucide Icons (string) or Roblox Image (number). 0 to use no icon (default).
+    LoadingTitle = "Legacy Hub",
+    LoadingSubtitle = "by King",
+    Theme = "Default", -- Check https://docs.sirius.menu/rayfield/configuration/themes
+ 
+    DisableRayfieldPrompts = false,
+    DisableBuildWarnings = false, -- Prevents Rayfield from warning when the script has a version mismatch with the interface
+ 
+    ConfigurationSaving = {
+       Enabled = true,
+       FolderName = nil, -- Create a custom folder for your hub/game
+       FileName = "Legacy Hub"
+    },
+ 
+    Discord = {
+       Enabled = true, -- Prompt the user to join your Discord server if their executor supports it
+       Invite = "gDKjAr4R", -- The Discord invite code, do not include discord.gg/. E.g. discord.gg/ABCD would be ABCD
+       RememberJoins = false -- Set this to false to make them join the discord every time they load it up
+    },
+ 
+    KeySystem = false, -- Set this to true to use our key system
+    KeySettings = {
+       Title = "Legacy Hub",
+       Subtitle = "Freemium Key System",
+       Note = 'Get your key by clicking the<font color="#32CD32"> "Get a Script Key" '.."</font>button! or alternatively, you can visit our discord below!", -- Use this to tell the user how to get a key
+       FileName = "LegacyKey", -- It is recommended to use something unique as other scripts using Rayfield may overwrite your key file
+       SaveKey = false, -- The user's key will be saved, but if you change the key, they will be unable to use your script
+       GrabKeyFromSite = false, -- If this is true, set Key below to the RAW site you would like Rayfield to get the key from
+       Key = {"Key"} -- List of keys that will be accepted by the system, can be RAW file links (pastebin, github etc) or simple strings ("hello","key22")
+    }
+ })
+
+local Tab = Window:CreateTab("Macro", "user-round-cog") -- Title, Image
+local Section = Tab:CreateSection("Macro Settings")
+getgenv().PlayerTV = tostring(game.Players.LocalPlayer.Name)
+ local Input = Tab:CreateInput({
+   Name = "Player name:",
+   CurrentValue = "",
+   PlaceholderText = tostring(game.Players.LocalPlayer.Name) or "Player name could not load! please input your roblox name here",
+   RemoveTextAfterFocusLost = false,
+   Flag = "Input1",
+   Callback = function(Text)
+      getgenv().PlayerTV = Text
+
+      if getgenv().PlayerTV ~= nil and game.Players:FindFirstChild(tostring(getgenv().PlayerTV)) then
+         Rayfield:Notify({
+            Title = "Player found!",
+            Content = "You can now go and toggle camera view",
+            Duration = 6,
+            Image = "rewind",
+         })
+      else
+         Rayfield:Notify({
+            Title = "Player not found!",
+            Content = "Make sure to write your main player name and not your nickname.",
+            Duration = 6,
+            Image = "rewind",
+         })
+      end
+
+   end,
+})
+
+--[[
+getgenv().StudsXG = 0
+local SliderXX = Tab:CreateSlider({
+   Name = "X View Slider",
+   Range = {0, 90},
+   Increment = 1,
+   Suffix = "X Studs",
+   CurrentValue = 0,
+   Flag = "Slider1X", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+   Callback = function(Value)
+      getgenv().StudsXG = Value
+   end,
+})
+]]
+
+getgenv().StudsYG = 20
+local SliderYY = Tab:CreateSlider({
+   Name = "Y View Slider",
+   Range = {10, 125},
+   Increment = 1,
+   Suffix = "Y Studs",
+   CurrentValue = 20,
+   Flag = "Slider1Y", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+   Callback = function(Value)
+      getgenv().StudsYG = Value
+   end,
+})
+
+--[[
+getgenv().StudsZG = 0
+local SliderZZ = Tab:CreateSlider({
+   Name = "Z View Slider",
+   Range = {0, 90},
+   Increment = 1,
+   Suffix = "Z Studs",
+   CurrentValue = 0,
+   Flag = "Slider1Z", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+   Callback = function(Value)
+      getgenv().StudsZG = Value
+   end,
+})
+]]
+
+--View
+
+local cam = workspace.CurrentCamera
+local char = game.Players.LocalPlayer.Character
+local hrp = char:WaitForChild("HumanoidRootPart")
+
+local cameraPart = Instance.new("Part")
+cameraPart.Transparency = 1
+cameraPart.CanCollide = false
+cameraPart.Parent = workspace
+
+if getgenv().StudsYG ~= nil then
+   cameraPart.CFrame = CFrame.new(hrp.Position + Vector3.new(0, tonumber(getgenv().StudsYG), 0), hrp.Position)
+else
+	cameraPart.CFrame = CFrame.new(hrp.Position + Vector3.new(0, 40, 0), hrp.Position)
+end
+local bp = Instance.new("BodyPosition")
+bp.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+bp.Parent = cameraPart
+
+getgenv().VState1 = false
+local Toggle = Tab:CreateToggle({
+	Name = "Toggle Camera View",
+	CurrentValue = false,
+	Flag = "Toggle1View", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+	Callback = function(Value)
+		if getgenv().PlayerTV ~= nil and game.Players:FindFirstChild(tostring(getgenv().PlayerTV)) then
+			if Value == true then
+            if getgenv().StudsYG ~= nil then
+               cameraPart.CFrame = CFrame.new(hrp.Position + Vector3.new(0, tonumber(getgenv().StudsYG), 0), hrp.Position)
+            else
+               cameraPart.CFrame = CFrame.new(hrp.Position + Vector3.new(0, 40, 0), hrp.Position)
+            end
+				cam.CameraType = Enum.CameraType.Scriptable
+				getgenv().VState1 = true
+			else
+				getgenv().VState1 = false
+				cam.CameraType = Enum.CameraType.Custom
+			end
+		else
+			if Value == false then
+				return
+			end
+
+			Rayfield:Notify({
+				Title = "Player not found!",
+				Content = "Make sure to write your main player name and not your nickname.",
+				Duration = 6,
+				Image = "rewind",
+			})
+		end
+	end,
+})
+
+game:GetService("RunService").RenderStepped:Connect(function()
+	if getgenv().VState1 == false then
+		return
+	end
+	if getgenv().StudsYG ~= nil then
+		bp.Position = hrp.Position + Vector3.new(0, getgenv().StudsYG, 0)
+		cam.CFrame = cameraPart.CFrame
+	else
+		bp.Position = hrp.Position + Vector3.new(0, 40, 0)
+		cam.CFrame = cameraPart.CFrame
+	end
+end)
+
+--View
+
+local Label = Tab:CreateLabel("Set Location by pressing the button below!", "locate-fixed")
+Label:Set("Set Location by pressing the button below!", "locate-fixed", Color3.fromRGB(125, 10, 10), true)
+getgenv().PosMap = nil
+local Button = Tab:CreateButton({
+   Name = "Press to Set Tp Location",
+   Callback = function()
+		local Pos = game.Players.LocalPlayer.Character.PrimaryPart.Position
+      Label:Set("Location Set at: x: "..math.round(Pos.X).." y: "..math.round(Pos.Y).." z: "..math.round(Pos.Z) , "locate-fixed", Color3.fromRGB(25, 125, 25), true)
+      getgenv().PosMap = game.Players.LocalPlayer.Character.PrimaryPart.Position
+   end,
+})
+
+getgenv().VState2 = false
+local Toggle2 = Tab:CreateToggle({
+   Name = "Toggle Teleport Location",
+   CurrentValue = false,
+   Flag = "Toggle2", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+   Callback = function(Value)
+      if getgenv().PosMap == nil then
+         if Value == false then
+            return
+         end
+         Rayfield:Notify({
+            Title = "Location not Set!",
+            Content = "Be sure to Set a Location before toggling.",
+            Duration = 6,
+            Image = "rewind",
+         })
+         return
+      end
+
+      if getgenv().VState2 == false then
+         getgenv().VState2 = true
+      else
+         getgenv().VState2 = false
+         game.Players:FindFirstChild(tostring(getgenv().PlayerTV)).Character.HumanoidRootPart.Anchored = false
+         return
+      end
+
+      if getgenv().PlayerTV ~= nil and game.Players:FindFirstChild(tostring(getgenv().PlayerTV)) then
+         getgenv().VState2 = true
+         while getgenv().VState2 == true do
+            local lookPosition = Vector3.new(90, 0, 0)
+            game.Players:FindFirstChild(tostring(getgenv().PlayerTV)).Character.PrimaryPart.CFrame = CFrame.new(getgenv().PosMap , lookPosition)
+            game.Players:FindFirstChild(tostring(getgenv().PlayerTV)).Character.HumanoidRootPart.Anchored = true
+            task.wait(1)
+         end
+      else
+         if Value == false then
+            return
+         end
+         Rayfield:Notify({
+            Title = "Player not found!",
+            Content = "Make sure to write your main player name and not your nickname.",
+            Duration = 6,
+            Image = "rewind",
+         })
+      end
+
+   end,
+})
+
+local Section = Tab:CreateSection("Note")
+local Button = Tab:CreateButton({
+   Name = "Press to copy Discord Server invite to clipboard",
+   Callback = function()
+		local copy = "https://discord.gg/gDKjAr4R"
+		setclipboard(tostring(copy))
+   end,
+})
+
+local Paragraph = Tab:CreateParagraph({Title = "Regarding Units/Other:", Content = "We are currently working on finding a solution to decompile the buffering system that the devs have put in our way. Until then, you may need to use the help of TinyTask/RepetiTouch Pro to place down units and upgrade them! If you find any bugs or have any suggestions on what to add next, join our Discord by pressing the button above!"})
+-- End
+
+local Tab2 = Window:CreateTab("Misc", "user-round-cog") -- Title, Image
+local Section = Tab2:CreateSection("Misc Settings")
+
+local Paragraph3 = Tab2:CreateParagraph({
+   Title = "Merchant Status", 
+   Content = "N/A"
+})
+
+getgenv().MerchantST = true
+local MerchantStatus = false
+task.delay(0, function()
+	while true do
+		if getgenv().MerchantST == false then
+			return
+		end
+		MerchantStatus = false
+		if game:GetService("Workspace"):FindFirstChild("ShadyBall") then
+			if game:GetService("Workspace").ShadyBall:FindFirstChild("HumanoidRootPart") then
+				MerchantStatus = true
+				Paragraph3:Set({
+					Title = "Merchant Status:", 
+					Content = "▣ Active"
+				})
+			end
+		end
+		if MerchantStatus == false then
+			Paragraph3:Set({
+				Title = "Merchant Status:", 
+				Content = "▢ Offline"
+			})
+		end
+      task.wait(5)
+	end
+end)
+
+local Button = Tab2:CreateButton({
+   Name = "Bring Merchant To You!",
+   Callback = function()
+      if game:GetService("Workspace"):FindFirstChild("ShadyBall") then
+         if game:GetService("Workspace").ShadyBall:FindFirstChild("HumanoidRootPart") then
+            game:GetService("Workspace").ShadyBall.HumanoidRootPart.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
+         end
+      end
+   end,
+})
+local Paragraph2 = Tab2:CreateParagraph({Title = "Extra Note For The Devs", Content = "If yall think you can stop THE KING, yall must be really dumb! :D"})
+-- End
+
+task.delay(0, function()
+	local SecondsLeft = tonumber(LRM_SecondsLeft)
+	while true do
+		task.wait(1)
+		SecondsLeft -= 1
+		if tonumber(SecondsLeft) <= 0 then
+
+			Rayfield:Notify({
+				Title = "Key Expired!",
+				Content = "Your key has expired, Legacy hub will close in 5 seconds!",
+				Duration = 5,
+				Image = "rewind",
+			})
+			wait(5)
+
+			getgenv().VState1 = false
+			getgenv().VState2 = false
+			getgenv().MerchantST = false
+
+			local Cam = workspace.CurrentCamera
+			Cam.CameraType = Enum.CameraType.Custom
+			local plrGame = game.Players.LocalPlayer
+			plrGame.Character.HumanoidRootPart.Anchored = false
+			plrGame:Kick("Key Expired!")
+
+			return
+		end
+	end
+end)
+
+-- End
+
+local Tab3 = Window:CreateTab("Themes", "palette")
+
+local Section = Tab3:CreateSection("Themes Settings")
+local Button = Tab3:CreateButton({
+    Name = "Default",
+    Callback = function()
+        Window.ModifyTheme('Default')
+    end,
+ })
+ local Button = Tab3:CreateButton({
+    Name = "Amber Glow",
+    Callback = function()
+        Window.ModifyTheme('AmberGlow')
+    end,
+ })
+ local Button = Tab3:CreateButton({
+    Name = "Amethyst",
+    Callback = function()
+        Window.ModifyTheme('Amethyst')
+    end,
+ })
+ local Button = Tab3:CreateButton({
+    Name = "Bloom",
+    Callback = function()
+        Window.ModifyTheme('Bloom')
+    end,
+ })
+ local Button = Tab3:CreateButton({
+    Name = "Dark Blue",
+    Callback = function()
+        Window.ModifyTheme('DarkBlue')
+    end,
+ })
+ local Button = Tab3:CreateButton({
+    Name = "Green",
+    Callback = function()
+        Window.ModifyTheme('Green')
+    end,
+ })
+ local Button = Tab3:CreateButton({
+    Name = "Light",
+    Callback = function()
+        Window.ModifyTheme('Light')
+    end,
+ })
+ local Button = Tab3:CreateButton({
+    Name = "Ocean",
+    Callback = function()
+        Window.ModifyTheme('Ocean')
+    end,
+ })
+ local Button = Tab3:CreateButton({
+    Name = "Serenity",
+    Callback = function()
+        Window.ModifyTheme('Serenity')
+    end,
+ })
+
+ -- End
